@@ -170,6 +170,13 @@ local backgroundImages = {
 	"https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/15.jpg",
 	"https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/16.jpg",
 	"https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/Image_1787322992460.jpg",
+	"https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/18.jpg",
+    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/19.jpg",
+    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/20.jpg",
+    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/21.jpg",
+    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/22.jpg",
+    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/23.jpg",
+    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/24.jpg",
 }
 local function getRandomBackground()
 	if not settings.randomBg or # backgroundImages == 0 then
