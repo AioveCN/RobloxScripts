@@ -170,13 +170,15 @@ local backgroundImages = {
 	"https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/15.jpg",
 	"https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/16.jpg",
 	"https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/Image_1787322992460.jpg",
-	"https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/18.jpg",
-    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/19.jpg",
-    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/20.jpg",
-    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/21.jpg",
-    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/22.jpg",
-    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/23.jpg",
-    "https://raw.githubusercontent.com/951357nvjn/background/refs/heads/main/24.jpg",
+    "https://raw.githubusercontent.com/AioveCN/RobloxScripts/main/bg1.jpg",
+    "https://raw.githubusercontent.com/AioveCN/RobloxScripts/main/bg2.jpg",
+    "https://raw.githubusercontent.com/AioveCN/RobloxScripts/main/bg3.jpg",
+    "https://raw.githubusercontent.com/AioveCN/RobloxScripts/main/bg4.jpg",
+    "https://raw.githubusercontent.com/AioveCN/RobloxScripts/main/bg5.jpg",
+    "https://raw.githubusercontent.com/AioveCN/RobloxScripts/main/bg6.jpg",
+    "https://raw.githubusercontent.com/AioveCN/RobloxScripts/main/bg7.jpg",
+    "https://raw.githubusercontent.com/AioveCN/RobloxScripts/main/bg8.jpg",
+	}
 }
 local function getRandomBackground()
 	if not settings.randomBg or # backgroundImages == 0 then
