@@ -2666,7 +2666,7 @@ local function createMainWindow()
 		end
 	})
 	Combat:Toggle({
-		Title = "只攻击警察",
+		Title = "只攻击CS警察",
 		Default = false,
 		Callback = function(v)
 			CombatConfig.auraOnlyPolice = v;
@@ -2785,7 +2785,7 @@ local function createMainWindow()
 		end
 	})
 	Aim:Toggle({
-		Title = "只自瞄平民",
+		Title = "只自瞄CS平民",
 		Default = false,
 		Callback = function(v)
 			AimConfig.onlyCivilian = v;
@@ -3145,7 +3145,7 @@ local function createMainWindow()
 		end
 	})
 	PlayerTab:Toggle({
-		Title = "无限跳跃",
+		Title = "无限跳跃（别被摔死了）",
 		Default = false,
 		Callback = function(v)
 			PlayerConfig.infiniteJump = v
@@ -3316,12 +3316,12 @@ local function createMainWindow()
 	end)
 end
 WindUI:Popup({
-	Title = "AioveCN Hub",
+	Title = "Aiove Hub",
 	Icon = "sparkles",
-	Content = "欢迎使用 AioveCN Hub\n精简版",
+	Content = "反馈与投稿QQ:3593722551 感谢PY HUB的开源",
 	Buttons = {
 		{
-			Title = "打开脚本",
+			Title = "打开脚本喵",
 			Variant = "Primary",
 			Callback = createMainWindow,
 		}
