@@ -3318,10 +3318,11 @@ end
 WindUI:Popup({
 	Title = "AioveCN Hub",
 	Icon = "sparkles",
-	Content = "欢迎使用 AioveCN Hub\n精简版",
+	Content = "Aiove永远不会付费，QQ:3347550253反馈和投稿
+       （感谢PY HUB的开源）",
 	Buttons = {
 		{
-			Title = "打开脚本",
+			Title = "打开脚本喵～",
 			Variant = "Primary",
 			Callback = createMainWindow,
 		}
