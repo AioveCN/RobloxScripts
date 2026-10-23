@@ -43,9 +43,19 @@ local function resolveGuiParent()
 	return parent
 end
 local UI_PARENT = resolveGuiParent()
-local RemoteFolder = ReplicatedStorage:WaitForChild("Remote", 30)
-local PlayerEvent = RemoteFolder and RemoteFolder:WaitForChild("PlayerEvent", 30)
-local PlayerFunc = RemoteFolder and RemoteFolder:WaitForChild("PlayerFunc", 30)
+local function getRemoteFolder()
+    return ReplicatedStorage:FindFirstChild("Remote")
+end
+
+local function getPlayerEvent()
+    local folder = getRemoteFolder()
+    return folder and folder:FindFirstChild("PlayerEvent")
+end
+
+local function getPlayerFunc()
+    local folder = getRemoteFolder()
+    return folder and folder:FindFirstChild("PlayerFunc")
+end
 local function SafeCall(fn, ...)
 	local args = {
 		...
