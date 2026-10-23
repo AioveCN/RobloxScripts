@@ -100,7 +100,7 @@ local function GetCharacter(player)
 	if not humanoid or not root then
 		return
 	end
-	return character, humanoid, root
+	return character, humanoid, root, humanoid.Sit
 end
 local function IsAlive(player)
 	local _, humanoid = GetCharacter(player)
@@ -623,11 +623,12 @@ local function teleportTo(pos)
 	local cf = CFrame.new(pos + Vector3.new(0, 3, 0))
 	character:PivotTo(cf)
 	pcall(function()
-		if PlayerEvent then
-			local id = ((character:GetAttribute("CharPivotToId") or 0) + 1) % 100
-			character:SetAttribute("CharPivotToId", id)
-			PlayerEvent:FireServer("charPivotTo", cf, character, id)
-		end
+		local ev = getPlayerEvent()
+        if ev then
+              local id = ((character:GetAttribute("CharPivotToId") or 0) + 1) % 100
+              character:SetAttribute("CharPivotToId", id)
+              ev:FireServer("charPivotTo", cf, character, id)
+			end
 	end)
 end
 local function startAutoMoneyLoop()
@@ -712,23 +713,22 @@ local function getBestMission()
 			end
 		end
 	end
-	return bestId
-end
-local function startMissionLoop()
-	task.spawn(function()
-		while true do
-			if State.autoMission and PlayerFunc and not hasActiveMission() then
-				local id = getBestMission()
-				if id then
-					pcall(function()
-						PlayerFunc:InvokeServer("talkToMission", tostring(id) .. "join")
-					end)
-				end
-			end
-			task.wait(MoneyConfig.missionInterval)
-		end
-	end)
-end
+	local function startMissionLoop()
+    task.spawn(function()
+        while true do
+            local func = getPlayerFunc()
+            if State.autoMission and func and not hasActiveMission() then
+                local id = getBestMission()
+                if id then
+                    pcall(function()
+                        func:InvokeServer("talkToMission", tostring(id) .. "join")
+                    end)
+                end
+            end
+            task.wait(MoneyConfig.missionInterval)
+        end
+    end)
+	end
 startMissionLoop()
 local function getFarmerDropOff()
 	local gameplay = ReplicatedStorage:FindFirstChild("Gameplay")
@@ -981,15 +981,20 @@ local function inCombat(player, enabled)
 end
 local auraLast = 0
 RunService.Heartbeat:Connect(function()
-	if not CombatConfig.auraEnabled or not PlayerEvent then
-		return
-	end
-	local now = tick()
+    if not CombatConfig.auraEnabled then
+        return
+    end
+    
+    -- 动态获取最新的 Remote
+    local ev = getPlayerEvent()
+    if not ev then return end
+
+    local now = tick()
 	if now - auraLast < CombatConfig.auraInterval then
 		return
 	end
-	local _, _, myRoot = GetCharacter(LocalPlayer)
-	if not myRoot then
+	local _, _, myRoot, isSeated = GetCharacter(LocalPlayer)
+if not myRoot or isSeated then
 		return
 	end
 	local nearest, nearestDist
@@ -1009,7 +1014,7 @@ RunService.Heartbeat:Connect(function()
 		local _, _, root = GetCharacter(nearest)
 		local myPos = myRoot.Position
 		pcall(function()
-			PlayerEvent:FireServer("damage", {
+			ev:FireServer("damage", {
 				bodyParts = {
 					{
 						"Head",
