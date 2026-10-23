@@ -43,19 +43,9 @@ local function resolveGuiParent()
 	return parent
 end
 local UI_PARENT = resolveGuiParent()
-local function getRemoteFolder()
-    return ReplicatedStorage:FindFirstChild("Remote")
-end
-
-local function getPlayerEvent()
-    local folder = getRemoteFolder()
-    return folder and folder:FindFirstChild("PlayerEvent")
-end
-
-local function getPlayerFunc()
-    local folder = getRemoteFolder()
-    return folder and folder:FindFirstChild("PlayerFunc")
-end
+local RemoteFolder = ReplicatedStorage:WaitForChild("Remote", 30)
+local PlayerEvent = RemoteFolder and RemoteFolder:WaitForChild("PlayerEvent", 30)
+local PlayerFunc = RemoteFolder and RemoteFolder:WaitForChild("PlayerFunc", 30)
 local function SafeCall(fn, ...)
 	local args = {
 		...
@@ -100,7 +90,7 @@ local function GetCharacter(player)
 	if not humanoid or not root then
 		return
 	end
-	return character, humanoid, root, humanoid.Sit
+	return character, humanoid, root
 end
 local function IsAlive(player)
 	local _, humanoid = GetCharacter(player)
@@ -410,14 +400,13 @@ local function setGhostMode(enabled)
 	end
 	if enabled then
 		pcall(function()
-	local stuff = ReplicatedStorage:FindFirstChild("Stuff")
-	local locations = stuff and stuff:FindFirstChild("Locations")
-	local target = locations and locations:GetChildren()[1] or nil
-	local func = getPlayerFunc()
-	if func then
-		func:InvokeServer("hideCharacterLocation", target)
-	end
-end)
+			local stuff = ReplicatedStorage:FindFirstChild("Stuff")
+			local locations = stuff and stuff:FindFirstChild("Locations")
+			local target = locations and locations:GetChildren()[1] or nil
+			if PlayerFunc then
+				PlayerFunc:InvokeServer("hideCharacterLocation", target)
+			end
+		end)
 		if InventoryModule and InventoryModule.canEquipSlot then
 			pcall(function()
 				InventoryModule.canEquipSlot(true)
@@ -450,11 +439,10 @@ end)
 		end
 		clearGhostConnections()
 		pcall(function()
-	local func = getPlayerFunc()
-	if func then
-		func:InvokeServer("hideCharacterLocation", false)
-	end
-end)
+			if PlayerFunc then
+				PlayerFunc:InvokeServer("hideCharacterLocation", false)
+			end
+		end)
 		setGhostVisuals(character, false)
 	end
 	updateGhostButton()
@@ -532,7 +520,6 @@ pcall(function()
 			return originalRagdollActivateServer(character, enable, duration, ...)
 		end
 	end
-end)
 end)
 local oldDamageNamecall
 pcall(function()
@@ -626,12 +613,11 @@ local function teleportTo(pos)
 	local cf = CFrame.new(pos + Vector3.new(0, 3, 0))
 	character:PivotTo(cf)
 	pcall(function()
-		local ev = getPlayerEvent()
-        if ev then
-              local id = ((character:GetAttribute("CharPivotToId") or 0) + 1) % 100
-              character:SetAttribute("CharPivotToId", id)
-              ev:FireServer("charPivotTo", cf, character, id)
-			end
+		if PlayerEvent then
+			local id = ((character:GetAttribute("CharPivotToId") or 0) + 1) % 100
+			character:SetAttribute("CharPivotToId", id)
+			PlayerEvent:FireServer("charPivotTo", cf, character, id)
+		end
 	end)
 end
 local function startAutoMoneyLoop()
@@ -716,22 +702,23 @@ local function getBestMission()
 			end
 		end
 	end
-	local function startMissionLoop()
-    task.spawn(function()
-        while true do
-            local func = getPlayerFunc()
-            if State.autoMission and func and not hasActiveMission() then
-                local id = getBestMission()
-                if id then
-                    pcall(function()
-                        func:InvokeServer("talkToMission", tostring(id) .. "join")
-                    end)
-                end
-            end
-            task.wait(MoneyConfig.missionInterval)
-        end
-    end)
-	end
+	return bestId
+end
+local function startMissionLoop()
+	task.spawn(function()
+		while true do
+			if State.autoMission and PlayerFunc and not hasActiveMission() then
+				local id = getBestMission()
+				if id then
+					pcall(function()
+						PlayerFunc:InvokeServer("talkToMission", tostring(id) .. "join")
+					end)
+				end
+			end
+			task.wait(MoneyConfig.missionInterval)
+		end
+	end)
+end
 startMissionLoop()
 local function getFarmerDropOff()
 	local gameplay = ReplicatedStorage:FindFirstChild("Gameplay")
@@ -908,33 +895,34 @@ local function startGolfLoop()
 				end
 			end
 			return obj
-		local func = getPlayerFunc()
-            if State.golf and func then
-	           pcall(function()
-	func:InvokeServer("miniGolf", "createLobby")
-	task.wait(0.1)
-	func:InvokeServer("miniGolf", "setLobbyBid", {
-		bid = 500
-	})
-	task.wait(0.1)
-	func:InvokeServer("miniGolf", "setLobbyReady")
-	task.wait(4)
-	func:InvokeServer("miniGolf", "shot")
-	task.wait(0.5)
-	local ball = findPath({
-	"Gameplay",
-	"Entities",
-	"Content",
-	LocalPlayer.Name
-})
-local target = findPath({
-	"Gameplay",
-	"Entities",
-	"Content",
-	"_Flag",
-	"FlagPole",
-	"Part"
-})
+		end
+		while true do
+			if State.golf and PlayerFunc then
+				pcall(function()
+					PlayerFunc:InvokeServer("miniGolf", "createLobby")
+					task.wait(0.1)
+					PlayerFunc:InvokeServer("miniGolf", "setLobbyBid", {
+						bid = 500
+					})
+					task.wait(0.1)
+					PlayerFunc:InvokeServer("miniGolf", "setLobbyReady")
+					task.wait(4)
+					PlayerFunc:InvokeServer("miniGolf", "shot")
+					task.wait(0.5)
+					local ball = findPath({
+						"Gameplay",
+						"Entities",
+						"Content",
+						LocalPlayer.Name
+					})
+					local target = findPath({
+						"Gameplay",
+						"Entities",
+						"Content",
+						"_Flag",
+						"FlagPole",
+						"Part"
+					})
 					if ball and target and ball:IsA("BasePart") then
 						ball.Position = target.Position
 					end
@@ -983,20 +971,15 @@ local function inCombat(player, enabled)
 end
 local auraLast = 0
 RunService.Heartbeat:Connect(function()
-    if not CombatConfig.auraEnabled then
-        return
-    end
-    
-    -- 动态获取最新的 Remote
-    local ev = getPlayerEvent()
-    if not ev then return end
-
-    local now = tick()
+	if not CombatConfig.auraEnabled or not PlayerEvent then
+		return
+	end
+	local now = tick()
 	if now - auraLast < CombatConfig.auraInterval then
 		return
 	end
-	local _, _, myRoot, isSeated = GetCharacter(LocalPlayer)
-if not myRoot or isSeated then
+	local _, _, myRoot = GetCharacter(LocalPlayer)
+	if not myRoot then
 		return
 	end
 	local nearest, nearestDist
@@ -1016,90 +999,7 @@ if not myRoot or isSeated then
 		local _, _, root = GetCharacter(nearest)
 		local myPos = myRoot.Position
 		pcall(function()
-			ev:FireServer("damage", {
-
-					if ball and target and ball:IsA("BasePart") then
-						ball.Position = target.Position
-					end
-				end)
-			end
-			task.wait(State.golf and 5 or 1)
-		end
-	end)
-end
-startGolfLoop()
-local CombatConfig = {
-	auraEnabled = false,
-	auraRange = 50,
-	auraDamage = 5,
-	auraInterval = 0.05,
-	auraOnlyPolice = false,
-	auraOnlyCivilian = false,
-	auraCombatCheck = false,
-	bulletEnabled = false,
-	bulletFov = 360,
-	bulletDistance = 300,
-	bulletPart = "Head",
-	bulletShowFov = true,
-	bulletColor = "红色",
-	bulletCombatCheck = false,
-	bulletOnlyPolice = false,
-	bulletOnlyCivilian = false,
-}
-local function targetAllowed(player, onlyPolice, onlyCivilian)
-	if not player or player == LocalPlayer then
-		return false
-	end
-	if onlyPolice then
-		return player.Team and player.Team.Name == "Police"
-	end
-	if onlyCivilian then
-		return player.Team and player.Team.Name == "Civilian"
-	end
-	return true
-end
-local function inCombat(player, enabled)
-	if not enabled then
-		return true
-	end
-	return player:GetAttribute("CombatMode") == true or player:GetAttribute("Pursuit") == true
-end
-local auraLast = 0
-RunService.Heartbeat:Connect(function()
-    if not CombatConfig.auraEnabled then
-        return
-    end
-    
-    -- 动态获取最新的 Remote
-    local ev = getPlayerEvent()
-    if not ev then return end
-
-    local now = tick()
-	if now - auraLast < CombatConfig.auraInterval then
-		return
-	end
-	local _, _, myRoot, isSeated = GetCharacter(LocalPlayer)
-if not myRoot or isSeated then
-		return
-	end
-	local nearest, nearestDist
-	for _, player in ipairs(Players:GetPlayers()) do
-		if targetAllowed(player, CombatConfig.auraOnlyPolice, CombatConfig.auraOnlyCivilian) and IsAlive(player) and inCombat(player, CombatConfig.auraCombatCheck) then
-			local _, _, root = GetCharacter(player)
-			if root then
-				local dist = (root.Position - myRoot.Position).Magnitude
-				if dist <= CombatConfig.auraRange and (not nearestDist or dist < nearestDist) then
-					nearestDist = dist
-					nearest = player
-				end
-			end
-		end
-	end
-	if nearest then
-		local _, _, root = GetCharacter(nearest)
-		local myPos = myRoot.Position
-		pcall(function()
-			ev:FireServer("damage", {
+			PlayerEvent:FireServer("damage", {
 				bodyParts = {
 					{
 						"Head",
@@ -1415,8 +1315,7 @@ local function createBeam(startPos, endPos)
 end
 task.spawn(function()
 	while true do
-	local ev = getPlayerEvent()
-	if RageConfig.enabled and ev then
+		if RageConfig.enabled and PlayerEvent then
 			local _, _, myRoot = GetCharacter(LocalPlayer)
 			if myRoot then
 				EquipWeapon()
@@ -1442,7 +1341,8 @@ task.spawn(function()
 										continue
 									end
 								end
-								ev:FireServer("damage", {
+								pcall(function()
+									PlayerEvent:FireServer("damage", {
 										bodyParts = {
 											{
 												RageConfig.bodyPart,
@@ -2574,18 +2474,18 @@ local function createMainWindow()
 		Opened = true
 	})
 	local Main = Section:Tab({
-		Title = "主要功能",
+		Title = "Aiove功能",
 		Icon = "sliders-h"
 	})
 	Main:Toggle({
-		Title = "无限体力",
+		Title = "无限体力∞",
 		Default = false,
 		Callback = function(v)
 			State.stamina = v
 		end
 	})
 	Main:Toggle({
-		Title = "无限饥饿",
+		Title = "无限饥饿∞",
 		Default = false,
 		Callback = function(v)
 			State.food = v
@@ -2625,7 +2525,7 @@ local function createMainWindow()
 		end
 	})
 	Main:Toggle({
-		Title = "防布娃娃",
+		Title = "防布娃娃（被电了之后会很奇怪👽）",
 		Default = false,
 		Callback = function(v)
 			State.noRagdoll = v
@@ -2639,7 +2539,7 @@ local function createMainWindow()
 		end
 	})
 	Main:Toggle({
-		Title = "防越狱拉回",
+		Title = "防监狱拉回（开启这个新房子会回拉）",
 		Default = false,
 		Callback = setAntiPrisonPull
 	})
@@ -2651,14 +2551,14 @@ local function createMainWindow()
 		end
 	})
 	Main:Toggle({
-		Title = "无限子弹",
+		Title = "无限子弹∞",
 		Default = false,
 		Callback = function(v)
 			State.infiniteAmmo = v
 		end
 	})
 	Main:Toggle({
-		Title = "快速射击",
+		Title = "快速射击😍",
 		Default = false,
 		Callback = function(v)
 			State.rapidFire = v;
@@ -2743,7 +2643,7 @@ local function createMainWindow()
 		end
 	})
 	Money:Toggle({
-		Title = "自动黑客小游戏",
+		Title = "自动黑客ATM",
 		Default = false,
 		Callback = setAutoHack
 	})
@@ -2776,7 +2676,7 @@ local function createMainWindow()
 		end
 	})
 	Combat:Toggle({
-		Title = "只攻击平民",
+		Title = "只攻击CS平民",
 		Default = false,
 		Callback = function(v)
 			CombatConfig.auraOnlyCivilian = v;
@@ -2875,7 +2775,7 @@ local function createMainWindow()
 		end
 	})
 	Aim:Toggle({
-		Title = "只自瞄警察",
+		Title = "只自瞄CS警察",
 		Default = false,
 		Callback = function(v)
 			AimConfig.onlyPolice = v;
