@@ -2470,22 +2470,22 @@ local function createMainWindow()
 		end
 	})
 	local Section = mainWindow:Section({
-		Title = "功能",
+		Title = "Aiove功能",
 		Opened = true
 	})
 	local Main = Section:Tab({
-		Title = "Aiove功能",
+		Title = "主要功能",
 		Icon = "sliders-h"
 	})
 	Main:Toggle({
-		Title = "无限体力∞",
+		Title = "无限体力∞（建议√）",
 		Default = false,
 		Callback = function(v)
 			State.stamina = v
 		end
 	})
 	Main:Toggle({
-		Title = "无限饥饿∞",
+		Title = "无限饥饿∞（建议√）",
 		Default = false,
 		Callback = function(v)
 			State.food = v
@@ -2497,7 +2497,7 @@ local function createMainWindow()
 		Callback = setCombatBlock
 	})
 	Main:Toggle({
-		Title = "隐身",
+		Title = "隐身（没什么用😭）",
 		Default = false,
 		Callback = setGhostMode
 	})
@@ -2532,14 +2532,14 @@ local function createMainWindow()
 		end
 	})
 	Main:Toggle({
-		Title = "防摔伤",
+		Title = "防摔伤（玩跳跃的一定要开）",
 		Default = false,
 		Callback = function(v)
 			State.noFallDamage = v
 		end
 	})
 	Main:Toggle({
-		Title = "防监狱拉回（开启这个新房子会回拉）",
+		Title = "防监狱拉回（开这个进房子会回拉）",
 		Default = false,
 		Callback = setAntiPrisonPull
 	})
@@ -2655,11 +2655,11 @@ local function createMainWindow()
 		end
 	})
 	local Combat = Section:Tab({
-		Title = "战斗",
+		Title = "战斗（杀戮光环😍）",
 		Icon = "crosshairs"
 	})
 	Combat:Toggle({
-		Title = "杀戮光环",
+		Title = "杀戮光环（千万别收枪，下车要重新开）",
 		Default = false,
 		Callback = function(v)
 			CombatConfig.auraEnabled = v
@@ -2950,14 +2950,14 @@ local function createMainWindow()
 		end
 	})
 	Rage:Toggle({
-		Title = "战斗状态检测",
+		Title = "战斗状态检测（检测有没有漏枪标）",
 		Default = false,
 		Callback = function(v)
 			RageConfig.combatCheck = v
 		end
 	})
 	Rage:Toggle({
-		Title = "锁定警察",
+		Title = "锁定CS警察",
 		Default = false,
 		Callback = function(v)
 			RageConfig.policeLock = v;
@@ -2967,7 +2967,7 @@ local function createMainWindow()
 		end
 	})
 	Rage:Toggle({
-		Title = "锁定平民",
+		Title = "锁定CS平民",
 		Default = false,
 		Callback = function(v)
 			RageConfig.civilianLock = v;
