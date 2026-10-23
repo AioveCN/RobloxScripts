@@ -3316,9 +3316,9 @@ local function createMainWindow()
 	end)
 end
 WindUI:Popup({
-	Title = "Aiove Hub",
+	Title = "Aiove Hub（此脚本只是作者拿来用一下开源 给大家用一下，永不收费😡）",
 	Icon = "sparkles",
-	Content = "反馈与投稿QQ:3593722551 感谢PY HUB的开源",
+	Content = "反馈与投稿QQ:3593722551 （遇到收费的请赶紧退款）感谢PY HUB的开源",
 	Buttons = {
 		{
 			Title = "打开脚本喵",
