@@ -2497,7 +2497,7 @@ local function createMainWindow()
 		Callback = setCombatBlock
 	})
 	Main:Toggle({
-		Title = "隐身（没什么用😭）",
+		Title = "隐身",
 		Default = false,
 		Callback = setGhostMode
 	})
